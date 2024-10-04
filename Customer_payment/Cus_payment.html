@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Details - Car Rental Services</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="script.js"></script>
+    <link rel="stylesheet" href="../Customer_Styles/cus_Styles.css">
+</head>
+
+<body>
+    <header class="header">
+        <div class="nav">
+            <div class="logo">
+                <img src="../asset/downloadlogo.png" alt="logo">
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="../Landing_Page/index.html">Home</a></li>
+                    <li><a href="../AboutUs/about.html">About Us</a></li>
+                    <li><a href="../Car_Categories/get-car.html">Get Car</a></li>
+                    <li><a href="../Contact_us/contact.html">Contact Us</a></li>
+                </ul>
+            </nav>
+            <div class="user-dropdown">
+                User ▼
+                <div class="user-dropdown-content">
+                    <a href="">Profile</a>
+                    <a href="../Customer_login/login.html">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="payment-form">
+            <div class="container">
+                <div class="reminder">
+                    <strong>Payment Reminder:</strong><br>
+                    Advance payment is <strong>Rs.1000</strong>.<br>
+                    The request is accepted only after paying the advance payment.<br>
+                    <span style="color: red;font-weight: bold;">Advance payment is non-refundable.</span>
+                </div>
+                <form id="payment-form">
+
+                    <div class="container">
+                        <h2>Car Rental Details</h2>
+                        <div id="car-details-container">
+                            <!-- Car details will be displayed here -->
+                        </div>
+                    </div>
+                    <fieldset>
+                        <legend>Payment Information</legend>
+
+                        <label for="payment-id">Recipt Number</label>
+                        <input type="number" id="payment-id" name="payment-id" required>
+
+                        <label for="payment-date"> Payment Date</label>
+                        <input type="date" id="payment-date" name="payment-date" required>
+
+                        <label for="payment-amount">Payment Amount</label>
+                        <input type="number" id="payment-amount" name="payment-amount" step="100" placeholder="Advance payment is Rs.1000 only" required>
+
+                        <label for="payment-method">Payment Method</label>
+                        <input type="text" id="payment-method" name="payment-method"
+                             required>
+
+                        <label for="payment-status">Payment status Message (max 20 words):</label>
+                        <input type="text" id="payment-status" name="payment-status" required>
+                        <p id="word-count">0/20 words</p>
+                        <button type="submit">Request</button>
+
+                    </fieldset>
+
+                    <div class="bank-details">
+                        <h3>Bank Details</h3>
+                        <p><strong>Bank:</strong> Commercial Bank</p>
+                        <p><strong>Account Number:</strong> 8107043582</p>
+                        <p><strong>Branch:</strong> Chunnakam</p>
+                        <p><strong>Account Holder:</strong> B. Kowarthanan</p>
+                    </div>
+
+
+                </form>
+            </div>
+
+        </section>
+
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-left">
+                <h3>Car Rental Services</h3>
+                <ul>
+                    <li><a href="../Landing_Page/index.html">Home</a></li>
+                    <li><a href="../AboutUs/about.html">About Us</a></li>
+                    <li><a href="../Car_Categories/get-car.html">Get Car</a></li>
+                    <li><a href="../Contact_us/contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-right">
+                <h3>Contact Info</h3>
+                <ul>
+                    <li>Address: 40/2 Madattady road, Maviddapuram tellippalai, Jaffna</li>
+                    <li>Email: <a href="mailto:info@carrental.com">info@carrental.com</a></li>
+                    <li>Phone: (+94) 456-7890</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Function to retrieve query parameters
+            function getQueryParam(param) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(param);
+            }
+
+            // Get carid from the URL
+            const carid = getQueryParam('carid');
+            const customerid = getQueryParam('customerid');
+
+            // Function to display car details by ID
+            function displayCarDetailsById(carId) {
+                const carDetailsJSON = localStorage.getItem('carDetails');
+                const carDetails = JSON.parse(carDetailsJSON) || [];
+
+                // Find the car detail matching the carId
+                const carDetail = carDetails.find(car => car.id === carId);
+
+                if (carDetail) {
+                    const carDetailsHTML = `
+                <h3>Brand: ${carDetail.brand}</h3>
+                <p><strong>Rental Car ID:</strong> ${carDetail.id}</p>
+                <p><strong>Model:</strong> ${carDetail.model}</p>
+                <p><strong>Start Date:</strong> ${carDetail.startDate}</p>
+                <p><strong>End Date:</strong> ${carDetail.endDate}</p>
+                <p><strong>Fuel:</strong> ${carDetail.fuel}</p>
+                <p><strong>Transmission:</strong> ${carDetail.transmission}</p>
+                <p><strong>Seats:</strong> ${carDetail.seats}</p>
+                <p><strong>Price per Hour:</strong> Rs.${carDetail.price}</p>
+                <p><strong>Total Hours:</strong> ${carDetail.totalHours}</p>
+                <p><strong>Total Price:</strong> Rs.${carDetail.totalPrice}</p>
+            `;
+
+                    document.getElementById('car-details-container').innerHTML = carDetailsHTML;
+
+                    // Save the selected car details for payment processing
+                    localStorage.setItem('lastCarDetail', JSON.stringify(carDetail));
+                } else {
+                    document.getElementById('car-details-container').innerHTML = '<p>No car details available for this ID.</p>';
+                }
+            }
+
+            // Call the function to display car details by ID
+            displayCarDetailsById(carid);
+
+            // Handle form submission
+            document.getElementById('payment-form').addEventListener('submit', function (event) {
+                event.preventDefault(); // Prevent the default form submission
+                
+                // Retrieve form data
+                const paymentId = document.getElementById('payment-id').value;
+                const paymentDate = document.getElementById('payment-date').value;
+                const paymentAmount = document.getElementById('payment-amount').value;
+                const paymentMethod = document.getElementById('payment-method').value;
+                const paymentStatus = document.getElementById('payment-status').value;
+
+                // Retrieve last car details from local storage
+                const lastCarDetail = JSON.parse(localStorage.getItem('lastCarDetail')) || [];
+
+
+                // Create a payment object with car details
+                const payment = {
+                    paymentid: paymentId,
+                    date: paymentDate,
+                    paymentamount: parseFloat(paymentAmount),
+                    paymentmethod: paymentMethod,
+                    paymentstatus: paymentStatus,
+                    rentalCarId: lastCarDetail.id || '',
+                    startDate: lastCarDetail.startDate || '',
+                    endDate: lastCarDetail.endDate || '',
+                    carModel: lastCarDetail.model || '',
+                    customerId: customerid,
+
+                    totalPrice: lastCarDetail.totalPrice || 0
+                };
+
+                // Retrieve existing payments from local storage
+                
+                let payments = JSON.parse(localStorage.getItem('payments')) || [];
+                if(payments.length===0){
+                    localStorage.setItem('payments', JSON.stringify(payments));
+                }else{
+                 payments = JSON.parse(localStorage.getItem('payments')) || [];
+
+                }
+                let isPayment = payments.find(p=>p.rentalCarId===lastCarDetail.id && p.customerId=== customerid)
+                console.log(isPayment);
+
+                
+                // Add the new payment to the array
+                if(isPayment){
+                    alert("you already requested the same car ")
+                }else{
+                payments.push(payment);
+            }
+
+                // Save the updated array back to local storage
+                localStorage.setItem('payments', JSON.stringify(payments));
+
+                // Optionally, show a confirmation message or redirect
+                alert('Request send successfully!');
+                // window.location.href = 'some-other-page.html'; // Redirect if needed
+            });
+        });
+
+    </script>
+
+
+</body>
+
+</html>
